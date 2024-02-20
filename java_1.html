@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TODO List</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <button id="getDataButton">Получить список</button>
+  <table id="todoTable">
+    <thead>
+      <tr>
+        <th>№</th>
+        <th>Пользователь</th>
+        <th>Задача</th>
+        <th>Выполнено</th>
+      </tr>
+    </thead>
+    <tbody id="todoBody"></tbody>
+  </table>
+
+  <script>
+    
+    document.getElementById('getDataButton').addEventListener('click', function() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://jsonplaceholder.typicode.com/todos', true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          var todos = JSON.parse(xhr.responseText);
+          var xhrUsers = new XMLHttpRequest();
+          xhrUsers.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+          xhrUsers.onload = function() {
+            if (xhrUsers.status === 200) {
+              var users = JSON.parse(xhrUsers.responseText);
+              for (var i = 0; i < todos.length; i++) {
+                var user = users.find(function(u) {
+                  return u.id === todos[i].userId;
+                });
+                var row = '<tr><td>' + (i + 1) + '</td><td>' + user.name + '</td><td>' + todos[i].title + '</td><td><input type="checkbox" ' + (todos[i].completed ? "checked" : "") + '></td></tr>';
+                $('#todoBody').append(row);
+              }
+            }
+          };
+          xhrUsers.send();
+        }
+      };
+      xhr.send();
+    });
+  </script>
+</body>
+</html>
